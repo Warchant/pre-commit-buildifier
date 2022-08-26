@@ -1,0 +1,9 @@
+- id: buildifier
+  name: "buildifier: format bazel files"
+  description: "Buildifier: bazel files formatter"
+  entry: pre-commit-buildifier
+  language: python
+  minimum_pre_commit_version: 2.9.0
+  require_serial: true
+  types_or:
+    - bazel

@@ -1,0 +1,45 @@
+# install pre-commit:
+#   poetry install
+# install hooks:
+#   poetry run pre-commit install
+# to run manually:
+#   poetry run pre-commit run
+# on all files:
+#   poetry run pre-commit run --all-files
+fail_fast: true
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+        types: [python, toml]
+    -   id: trailing-whitespace
+-   repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
+    hooks:
+      - id: python-check-mock-methods
+      - id: python-use-type-annotations
+      - id: python-no-eval
+-   repo: local
+    hooks:
+      - id: mypy
+        name: "mypy: checking types"
+        entry: poetry run mypy --non-interactive --install-types
+        language: system
+        types: [python]
+      - id: pyupgrade
+        name: "pyupgrade: modernize code"
+        entry: poetry run pyupgrade --py37-plus
+        language: system
+        types: [python]
+      - id: isort
+        name: "isort: fixing includes"
+        entry: poetry run isort --profile black --filter-files
+        language: system
+        types: [python]
+      - id: black
+        name: "black: format python files"
+        entry: poetry run black
+        language: system
+        types: [python]
