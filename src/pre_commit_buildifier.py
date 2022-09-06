@@ -1,6 +1,8 @@
 import argparse
 import logging
 import os
+import shutil
+import stat
 import subprocess
 import sys
 from io import UnsupportedOperation
@@ -8,6 +10,12 @@ from io import UnsupportedOperation
 import requests
 
 logging.root.name = "pre-commit-buildifier"
+
+
+def chmod(file):
+    assert os.path.exists(file), file
+    st = os.stat(file)
+    os.chmod(file, st.st_mode | stat.S_IEXEC)
 
 
 def download_file(url, local_file_path):
@@ -22,6 +30,9 @@ def download_file(url, local_file_path):
         with open(local_file_path, "wb") as local_file:
             for chunk in r.iter_content(chunk_size=2**12):
                 local_file.write(chunk)
+
+        # make it executable
+        chmod(local_file_path)
     except Exception as e:
         logging.critical(f"Cannot write to a file {local_file_path}: {e}")
         sys.exit(1)
@@ -48,17 +59,35 @@ def get_name(version):
 
 
 # https://github.com/bazelbuild/buildtools/releases/download/5.1.0/buildozer-windows-amd64.exe
-def get_buildifier(version):
-    if not version:
+def get_buildifier(args):
+    if not args.path and not args.version:
+        raise ValueError("--path or --version should be set")
+
+    if args.path:
+        path = shutil.which("buildifier")
+        if not path or not os.path.exists(path) or not os.path.isfile(path):
+            return None
+
+        logging.info(f"Found buildififer in PATH: {path}")
+        chmod(path)
+        return path
+
+    if not args.version:
         raise ValueError("version cannot be empty")
 
     basedir = os.path.dirname(__file__)
-    name = get_name(version)
+    name = get_name(args.version)
     bpath = os.path.join(basedir, name)
     if not os.path.exists(bpath):
         # buildifier of this version does ot exist
         logging.info(f"{name} does not exist. Downloading...")
-        url = f"https://github.com/bazelbuild/buildtools/releases/download/{version}/buildifier-{get_os()}-amd64.exe"
+
+        _os = get_os()
+        ext = ""
+        if _os == "windows":
+            ext = ".exe"
+
+        url = f"https://github.com/bazelbuild/buildtools/releases/download/{args.version}/buildifier-{_os}-amd64{ext}"
         download_file(url, bpath)
     return bpath
 
@@ -72,8 +101,18 @@ def main():
         action="store",
         help="Buildifier version",
     )
+    parser.add_argument(
+        "--path",
+        default=False,
+        action="store_true",
+        help="Search for buildifier in PATH (default: False)",
+    )
     parser.add_argument("file", nargs="+", action="store")
     args, extra = parser.parse_known_args()
 
-    buildifier_bin = get_buildifier(args.version)
+    buildifier_bin = get_buildifier(args)
     subprocess.check_call([buildifier_bin, "-lint=fix"] + extra + args.file)
+
+
+if __name__ == "__main__":
+    main()
