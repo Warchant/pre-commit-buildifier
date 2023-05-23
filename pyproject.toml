@@ -14,7 +14,7 @@ exclude = [
 
 [tool.poetry.dependencies]
 python = ">=3.7, <4.0"
-requests = "^2.28.1"
+requests = "^2.31.0"
 
 
 [tool.poetry.dev-dependencies]
