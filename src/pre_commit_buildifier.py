@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import platform
 import shutil
 import stat
 import subprocess
@@ -50,6 +51,13 @@ def get_os():
     raise UnsupportedOperation(f"Unsupported os: {platform}")
 
 
+def get_arch():
+    arch = platform.machine()
+    if arch == "x86_64":
+        arch = "amd64"
+    return arch
+
+
 def get_name(version):
     o = get_os()
     name = f"buildifier_{o}_{version}"
@@ -83,11 +91,12 @@ def get_buildifier(args):
         logging.info(f"{name} does not exist. Downloading...")
 
         _os = get_os()
+        _arch = get_arch()
         ext = ""
         if _os == "windows":
             ext = ".exe"
 
-        url = f"https://github.com/bazelbuild/buildtools/releases/download/{args.version}/buildifier-{_os}-amd64{ext}"
+        url = f"https://github.com/bazelbuild/buildtools/releases/download/{args.version}/buildifier-{_os}-{_arch}{ext}"
         download_file(url, bpath)
     return bpath
 
