@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "pre-commit-buildifier"
-version = "0.0.2"
+version = "0.1.0"
 description = "Pre-commit hook which downloads and runs bazel buildifier"
 authors = [
-    "Bohdan Vanieiev <bohdan.vanieiev@aptiv.com>",
+    "Bohdan Vanieiev <warchantua@gmail.com>",
 ]
 exclude = [
     # ignore all tests

@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import platform
 import shutil
 import stat
 import subprocess
@@ -10,6 +11,16 @@ from io import UnsupportedOperation
 import requests
 
 logging.root.name = "pre-commit-buildifier"
+
+
+def get_processor():
+    if platform.machine().lower() in ["amd64", "x86_64"]:
+        return "amd64"
+
+    if "arm" in platform.processor().lower():
+        return "arm64"
+
+    raise NotImplementedError(f"Target CPU/OS is not supported: {platform.machine()}")
 
 
 def chmod(file):
@@ -87,7 +98,8 @@ def get_buildifier(args):
         if _os == "windows":
             ext = ".exe"
 
-        url = f"https://github.com/bazelbuild/buildtools/releases/download/{args.version}/buildifier-{_os}-amd64{ext}"
+        cpu = get_processor()
+        url = f"https://github.com/bazelbuild/buildtools/releases/download/{args.version}/buildifier-{_os}-{cpu}{ext}"
         download_file(url, bpath)
     return bpath
 
