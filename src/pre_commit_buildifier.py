@@ -123,7 +123,7 @@ def main():
     args, extra = parser.parse_known_args()
 
     buildifier_bin = get_buildifier(args)
-    subprocess.check_call([buildifier_bin, "-lint=fix"] + extra + args.file)
+    subprocess.check_call([buildifier_bin, "--lint=fix"] + extra + args.file)
 
 
 if __name__ == "__main__":
