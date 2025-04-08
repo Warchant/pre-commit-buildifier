@@ -7,3 +7,12 @@
   require_serial: true
   types_or:
     - bazel
+- id: buildifier-lint
+  name: "buildifier: lint bazel files"
+  description: "Buildifier: bazel files linting"
+  entry: pre-commit-buildifier --lint=warn
+  language: python
+  minimum_pre_commit_version: 2.9.0
+  require_serial: true
+  types_or:
+    - bazel
