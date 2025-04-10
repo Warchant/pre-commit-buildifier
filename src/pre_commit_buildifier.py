@@ -108,7 +108,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--version",
-        default="v6.3.2",
+        default="v8.0.3",
         type=str,
         action="store",
         help="Buildifier version",

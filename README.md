@@ -20,5 +20,5 @@ repos:
     rev: 0.1.4
     hooks:
     -   id: buildifier
-        args: [--version, "v6.3.2", --mode=fix]
+        args: [--version, "v8.0.3", --mode=fix]
 ```
